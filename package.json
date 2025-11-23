@@ -2,11 +2,16 @@
   "name": "url-shortener-microservice",
   "version": "1.0.0",
   "description": "FreeCodeCamp URL Shortener Microservice",
-  "main": "api/shorturl.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "vercel dev"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
-  "dependencies": {},
-  "keywords": ["freecodecamp", "url-shortener"],
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "keywords": ["freecodecamp", "api"],
+  "author": "",
   "license": "MIT"
 }
