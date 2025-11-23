@@ -1,125 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener Microservice</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .container {
-            background: #f9f9f9;
-            padding: 30px;
-            border-radius: 10px;
-        }
-        input[type="text"] {
-            width: 300px;
-            padding: 10px;
-            margin-right: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        #result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-        .error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-        code {
-            background: #f4f4f4;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
+        body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
+        input, button { padding: 10px; margin: 5px; }
+        input { width: 300px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>URL Shortener Microservice</h1>
-        
-        <section>
-            <h3>Shorten URL</h3>
-            <input type="text" id="urlInput" placeholder="https://www.example.com">
-            <button onclick="shortenUrl()">POST URL</button>
-            <div id="result"></div>
-        </section>
-
-        <section>
-            <h3>Example Usage</h3>
-            <p><strong>POST</strong> <code>/api/shorturl</code></p>
-            <p><strong>Body:</strong> <code>{"url":"https://www.freecodecamp.org"}</code></p>
-            <p><strong>Response:</strong> <code>{"original_url":"https://www.freecodecamp.org","short_url":1}</code></p>
-            
-            <p><strong>Visit:</strong> <code>/api/shorturl/1</code> to be redirected to the original URL.</p>
-        </section>
+    <h1>URL Shortener Microservice</h1>
+    
+    <div>
+        <h3>Shorten URL</h3>
+        <form id="urlForm">
+            <input type="text" id="url_input" placeholder="https://www.example.com" size="50">
+            <button type="submit">POST URL</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    
+    <div>
+        <h3>Example Usage</h3>
+        <code>POST /api/shorturl - body: {"url":"https://www.google.com"}</code><br>
+        <code>GET /api/shorturl/1 - redirects to original URL</code>
     </div>
 
     <script>
-        async function shortenUrl() {
-            const url = document.getElementById('urlInput').value.trim();
+        document.getElementById('urlForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = document.getElementById('url_input').value;
             const resultDiv = document.getElementById('result');
-
-            if (!url) {
-                resultDiv.innerHTML = '<div class="error">Please enter a URL</div>';
-                return;
-            }
-
+            
             try {
                 const response = await fetch('/api/shorturl', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: url })
                 });
-
-                const data = await response.json();
                 
-                if (data.error) {
-                    resultDiv.innerHTML = `<div class="error">Error: ${data.error}</div>`;
-                } else {
-                    const shortUrl = `${window.location.origin}/api/shorturl/${data.short_url}`;
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <strong>Success!</strong><br>
-                            <strong>Original URL:</strong> ${data.original_url}<br>
-                            <strong>Short URL:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a>
-                        </div>
-                    `;
-                }
+                const data = await response.json();
+                resultDiv.innerHTML = JSON.stringify(data, null, 2);
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-            }
-        }
-
-        // Enter key support
-        document.getElementById('urlInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                shortenUrl();
+                resultDiv.innerHTML = 'Error: ' + error.message;
             }
         });
     </script>
