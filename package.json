@@ -1,0 +1,15 @@
+{
+  "name": "url-shortener-microservice",
+  "version": "1.0.0",
+  "description": "FreeCodeCamp URL Shortener Microservice",
+  "main": "api/shorturl.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^28.0.0"
+  },
+  "keywords": ["freecodecamp", "url-shortener"],
+  "license": "MIT"
+}
