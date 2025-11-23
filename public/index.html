@@ -2,14 +2,17 @@
 <html>
   <head>
     <title>URL Shortener Microservice</title>
-    <link rel="shortcut icon" href="https://cdn.freecodecamp.org/universal/favicons/favicon.ico" type="image/x-icon"/>
-    <link href="/public/style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <h1>URL Shortener Microservice</h1>
-    <main>
+    <div class="container">
+      <h1>URL Shortener Microservice</h1>
+      
       <section>
-        <form action="api/shorturl" method="POST">
+        <h2>Short URL Creation</h2>
+        <p>Example: POST [project_url]/api/shorturl - https://www.google.com</p>
+        
+        <form action="/api/shorturl" method="POST">
           <fieldset>
             <legend>URL Shortener</legend>
             <label for="url_input">URL:</label>
@@ -18,9 +21,23 @@
           </fieldset>
         </form>
       </section>
-    </main>
-    <footer>
-      <p>By <a href="https://www.freecodecamp.org/">freeCodeCamp</a></p>
-    </footer>
+      
+      <section>
+        <h2>Example Usage:</h2>
+        <p>
+          <a href="/api/shorturl/1">[this_project_url]/api/shorturl/1</a>
+        </p>
+        <p>Will redirect to: https://www.freecodecamp.org/</p>
+      </section>
+      
+      <section>
+        <h2>How It Works:</h2>
+        <ol>
+          <li>POST a valid URL to <code>/api/shorturl</code></li>
+          <li>Receive a JSON response with <code>original_url</code> and <code>short_url</code> properties</li>
+          <li>Visit <code>/api/shorturl/&lt;short_url&gt;</code> to be redirected to the original URL</li>
+        </ol>
+      </section>
+    </div>
   </body>
 </html>
