@@ -1,50 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>URL Shortener Microservice</title>
-    <style>
-        body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
-        input, button { padding: 10px; margin: 5px; }
-        input { width: 300px; }
-    </style>
+  <title>URL Shortener Microservice</title>
+  <link rel="shortcut icon" href="https://cdn.freecodecamp.org/universal/favicons/favicon.ico" type="image/x-icon"/>
+  <link href="/public/style.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      color: #222;
+      background-color: #fff;
+      text-align: center;
+      line-height: 1.4em;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    h1 {
+      margin-top: 30px;
+    }
+    
+    form {
+      margin: 30px auto;
+      padding: 20px;
+      max-width: 600px;
+    }
+    
+    label {
+      margin-right: 10px;
+    }
+    
+    input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 300px;
+    }
+    
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    
+    code {
+      background-color: #f4f4f4;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    
+    .usage {
+      text-align: left;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+  </style>
 </head>
 <body>
-    <h1>URL Shortener Microservice</h1>
+  <h1>URL Shortener Microservice</h1>
+  
+  <main>
+    <section>
+      <form action="api/shorturl" method="POST">
+        <fieldset>
+          <legend>URL Shortener</legend>
+          <label for="url_input">URL:</label>
+          <input id="url_input" type="text" name="url" placeholder="https://www.freecodecamp.org/" />
+          <input type="submit" value="POST URL" />
+        </fieldset>
+      </form>
+    </section>
     
-    <div>
-        <h3>Shorten URL</h3>
-        <form id="urlForm">
-            <input type="text" id="url_input" placeholder="https://www.example.com" size="50">
-            <button type="submit">POST URL</button>
-        </form>
-        <div id="result"></div>
-    </div>
-    
-    <div>
-        <h3>Example Usage</h3>
-        <code>POST /api/shorturl - body: {"url":"https://www.google.com"}</code><br>
-        <code>GET /api/shorturl/1 - redirects to original URL</code>
-    </div>
-
-    <script>
-        document.getElementById('urlForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const url = document.getElementById('url_input').value;
-            const resultDiv = document.getElementById('result');
-            
-            try {
-                const response = await fetch('/api/shorturl', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
-                });
-                
-                const data = await response.json();
-                resultDiv.innerHTML = JSON.stringify(data, null, 2);
-            } catch (error) {
-                resultDiv.innerHTML = 'Error: ' + error.message;
-            }
-        });
-    </script>
+    <section class="usage">
+      <h2>Example Usage:</h2>
+      <p>POST to <code>[project_url]/api/shorturl</code> with body: <code>{"url":"https://www.freecodecamp.org"}</code></p>
+      <p>Returns: <code>{"original_url":"https://www.freecodecamp.org","short_url":1}</code></p>
+      <p>Then visit: <code>[project_url]/api/shorturl/1</code> to be redirected to the original URL</p>
+    </section>
+  </main>
+  
+  <footer>
+    <p>By <a href="https://www.freecodecamp.org/">freeCodeCamp</a></p>
+  </footer>
 </body>
 </html>
