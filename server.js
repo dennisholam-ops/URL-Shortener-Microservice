@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const dns = require('dns');
+const url = require('url');
+
 const app = express();
 
 // Basic Configuration
@@ -11,87 +13,98 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use('/public', express.static(`${process.cwd()}/public`));
+app.use(express.static('public'));
+
+// In-memory storage for URLs (in production, use a database)
+let urlDatabase = [];
+let urlCounter = 1;
+
+// Helper function to validate URL
+function isValidUrl(string) {
+  try {
+    const parsedUrl = new URL(string);
+    return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+  } catch (err) {
+    return false;
+  }
+}
+
+// Helper function to check if URL exists using DNS lookup
+function urlExists(hostname, callback) {
+  dns.lookup(hostname, (err) => {
+    callback(!err);
+  });
+}
 
 // Routes
-app.get('/', function(req, res) {
-  res.sendFile(process.cwd() + '/views/index.html');
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/views/index.html');
 });
 
-// Your first API endpoint
-app.get('/api/hello', function(req, res) {
-  res.json({ greeting: 'hello API' });
-});
-
-// URL Shortener Logic
-let urlDatabase = [];
-let shortUrlCounter = 1;
-
-app.post('/api/shorturl', function(req, res) {
+// POST endpoint to shorten URL
+app.post('/api/shorturl', (req, res) => {
   const originalUrl = req.body.url;
   
   // Validate URL format
-  let urlObject;
-  try {
-    urlObject = new URL(originalUrl);
-  } catch (err) {
+  if (!isValidUrl(originalUrl)) {
     return res.json({ error: 'invalid url' });
   }
   
-  // Check protocol
-  const allowedProtocols = ['http:', 'https:'];
-  if (!allowedProtocols.includes(urlObject.protocol)) {
-    return res.json({ error: 'invalid url' });
-  }
+  // Extract hostname for DNS lookup
+  const hostname = new URL(originalUrl).hostname;
   
-  // DNS lookup to verify host exists
-  dns.lookup(urlObject.hostname, (err) => {
-    if (err) {
+  // Check if URL exists
+  urlExists(hostname, (exists) => {
+    if (!exists) {
       return res.json({ error: 'invalid url' });
     }
     
-    // Check if URL already exists
-    const existingEntry = urlDatabase.find(entry => entry.original_url === originalUrl);
-    if (existingEntry) {
+    // Check if URL already exists in database
+    const existingUrl = urlDatabase.find(entry => entry.original_url === originalUrl);
+    
+    if (existingUrl) {
       return res.json({
-        original_url: existingEntry.original_url,
-        short_url: existingEntry.short_url
+        original_url: existingUrl.original_url,
+        short_url: existingUrl.short_url
       });
     }
     
     // Create new short URL
-    const newEntry = {
+    const shortUrl = urlCounter++;
+    const newUrl = {
       original_url: originalUrl,
-      short_url: shortUrlCounter
+      short_url: shortUrl
     };
     
-    urlDatabase.push(newEntry);
+    urlDatabase.push(newUrl);
     
     res.json({
-      original_url: newEntry.original_url,
-      short_url: newEntry.short_url
+      original_url: originalUrl,
+      short_url: shortUrl
     });
-    
-    shortUrlCounter++;
   });
 });
 
-// Redirect short URL to original URL
-app.get('/api/shorturl/:short_url', function(req, res) {
+// GET endpoint to redirect to original URL
+app.get('/api/shorturl/:short_url', (req, res) => {
   const shortUrl = parseInt(req.params.short_url);
+  
+  if (isNaN(shortUrl)) {
+    return res.json({ error: 'invalid short url' });
+  }
   
   const urlEntry = urlDatabase.find(entry => entry.short_url === shortUrl);
   
-  if (urlEntry) {
-    res.redirect(urlEntry.original_url);
-  } else {
-    res.json({ error: 'No short URL found for the given input' });
+  if (!urlEntry) {
+    return res.json({ error: 'short url not found' });
   }
+  
+  res.redirect(urlEntry.original_url);
 });
 
 // Start server
-app.listen(port, function() {
-  console.log(`Listening on port ${port}`);
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
 
 module.exports = app;
