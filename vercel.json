@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/shorturl",
+      "methods": ["GET", "POST"],
+      "dest": "/api/shorturl"
+    },
+    {
+      "src": "/api/shorturl/(.*)",
+      "dest": "/api/shorturl"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ]
+}
